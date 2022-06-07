@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useReducer, useState } from 'react';
 import axios from 'axios';
-import { sortBy } from 'lodash';
+// import { sortBy } from 'lodash';
 import List from './components/List';
 import SearchForm from './components/SearchForm';
 
@@ -53,31 +53,13 @@ const storiesReducer = (state, action) => {
   }
 };
 
-const sortReducer =(state, action) => {
-  switch (action.type) {
-    case 'SORT_BY_TITLE':
-        console.log('sorting by title...');
-        break;
-    case 'SORT_BY_AUTHOR':
-      console.log('sorting by author...');
-      break;
-    case 'SORT_BY_POINTS':
-    console.log('sorting by points...');
-    break;
-    case 'SORT_BY_NUMBER_OF_COMMENTS':
-      console.log('sorting by number of comments...');
-      break;
-    default:
-      console.log(state,'Invalid sorting parameter');
-  }
-}
 
 const App = () => {
   const [searchTerm, setSearchTerm] = useSemiPersistentState(
     'search',
     'React'
   );
-  const [sortState, setSortState] = useState('');
+  const [sortState, setSortState] = useState(null);
 
   const [url, setUrl] = useState(
     `${API_ENDPOINT}${searchTerm}`
@@ -87,7 +69,7 @@ const App = () => {
     storiesReducer,
     { data: [], isLoading: false, isError: false }
   );
-  const [sort, dispatchSort] = useReducer(sortReducer, {});
+  // const [sort, dispatchSort] = useReducer(sortReducer, {});
 
   const handleFetchStories = useCallback(async () => {
     dispatchStories({ type: 'STORIES_FETCH_INIT' });
@@ -125,23 +107,18 @@ const App = () => {
     event.preventDefault();
   };
 
-  const handleSort = (e) => {
-    e.preventDefault();
-    console.log({value: e.target.value})
-    if(e.target.value === 'title'){
+  // const handleSort = (e) => {
+  //   e.preventDefault();
+  //   console.log({value: e.target.value})
+  //   if(e.target.value === 'title'){
+  //   }else if(e.target.value === 'author'){
+  //   } else if(e.target.value === 'points'){
+  //   }else if(e.target.value === 'num_comments'){
+  //   }else{
+  //     alert('Invalid field');
+  //   }
 
-      dispatchSort({type: 'SORT_BY_TITLE'});
-    }else if(e.target.value === 'author'){
-      dispatchSort({type: 'SORT_BY_AUTHOR'});
-    } else if(e.target.value === 'points'){
-      dispatchSort({type: 'SORT_BY_POINTS'});
-    }else if(e.target.value === 'num_comments'){
-      dispatchSort({type: 'SORT_BY_NUMBER_OF_COMMENTS'});
-    }else{
-      alert('Invalid field');
-    }
-
-  }
+  // }
 
   return (
     <div>
@@ -150,7 +127,7 @@ const App = () => {
       <h3>Sort</h3> <br />
       <label for="sort">Sort By</label> <br />
       
-        <select name="sort" id="lang" onChange={handleSort}>
+        <select name="sort" id="lang" onChange={(e)=> setSortState(e.target.value)}>
           <option value="def">select...</option>
           <option value="title">Title</option>
           <option value="author">Author</option>
@@ -171,7 +148,7 @@ const App = () => {
       {stories.isLoading ? (
         <p>Loading ...</p>
       ) : (
-        <List list={stories.data} onRemoveItem={handleRemoveStory} />
+        <List list={stories.data} onRemoveItem={handleRemoveStory} sortBy={sortState} />
       )}
     </div>
   );

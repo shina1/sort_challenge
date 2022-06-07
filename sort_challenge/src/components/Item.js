@@ -1,13 +1,16 @@
 import React from "react";
+import './componentStyle.css';
+
+
 
 const Item = ({ item, onRemoveItem }) => (
-    <div>
+    <div className="item_list_cont">
       <span>
         <a href={item.url}>{item.title}</a>
       </span>
-      <span>{item.author}</span>
-      <span>{item.num_comments}</span>
-      <span>{item.points}</span>
+      <span><b>Author:</b> {item.author}</span>
+      <span><b>No. Comments:</b> {item.num_comments}</span>
+      <span><b>Points:</b> {item.points}</span>
       <span>
         <button type="button" onClick={() => onRemoveItem(item)}>
           Dismiss
