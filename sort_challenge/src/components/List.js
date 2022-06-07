@@ -1,17 +1,18 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Item from "./Item";
 
-const sortFunc = (list, key, onRemoveItem) => {
+const sortFunc = (list, key, reverse, onRemoveItem) => {
+
 const newListCopy = [...list];
 
 if(key){
   newListCopy.sort((a, b) => {
-    const firstValue = a[key];
-    const secondValue = b[key]
+    const [firstValue, secondValue] = reverse ? [b[key], a[key]] : [a[key], b[key]];
+   
     if(typeof firstValue === 'string'){
-      return firstValue.localeCompare(secondValue)
+        return firstValue.localeCompare(secondValue)
     }else{
-      return firstValue - secondValue
+        return firstValue - secondValue
     }
   }); 
 }
@@ -24,9 +25,9 @@ if(key){
 ));
 }
 
-const List = ({ list, sortBy, onRemoveItem }) =>{
+const List = ({ list, sortBy, reverse, onRemoveItem }) =>{
   console.log(sortBy)
-  return sortFunc(list, sortBy, onRemoveItem);
+  return sortFunc(list, sortBy,reverse, onRemoveItem);
 }
 
 export default List;
