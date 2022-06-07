@@ -61,21 +61,22 @@ const App = () => {
   );
   const [sortState, setSortState] = useState(null);
 
-  const [url, setUrl] = useState(
-    `${API_ENDPOINT}${searchTerm}`
+  const [urls, setUrls] = useState(
+    [`${API_ENDPOINT}${searchTerm}`]
   );
 
   const [stories, dispatchStories] = useReducer(
     storiesReducer,
     { data: [], isLoading: false, isError: false }
   );
-  // const [sort, dispatchSort] = useReducer(sortReducer, {});
+  const [reverse, setReverse] = useState(false);
 
   const handleFetchStories = useCallback(async () => {
     dispatchStories({ type: 'STORIES_FETCH_INIT' });
 
     try {
-      const result = await axios.get(url);
+  
+      const result = await axios.get(urls[urls.length - 1]);
 
       dispatchStories({
         type: 'STORIES_FETCH_SUCCESS',
@@ -84,7 +85,7 @@ const App = () => {
     } catch {
       dispatchStories({ type: 'STORIES_FETCH_FAILURE' });
     }
-  }, [url]);
+  }, [urls]);
 
   useEffect(() => {
     handleFetchStories();
@@ -102,23 +103,18 @@ const App = () => {
   };
 
   const handleSearchSubmit = event => {
-    setUrl(`${API_ENDPOINT}${searchTerm}`);
+    const sliceIndex = urls.length == 5 ? 1 : 0; 
+    setUrls(Array.from(new Set(urls.slice(sliceIndex).concat(`${API_ENDPOINT}${searchTerm}`))));
 
     event.preventDefault();
   };
 
-  // const handleSort = (e) => {
-  //   e.preventDefault();
-  //   console.log({value: e.target.value})
-  //   if(e.target.value === 'title'){
-  //   }else if(e.target.value === 'author'){
-  //   } else if(e.target.value === 'points'){
-  //   }else if(e.target.value === 'num_comments'){
-  //   }else{
-  //     alert('Invalid field');
-  //   }
-
-  // }
+  const handleReverse = () => {
+      setReverse(!reverse)
+  }
+//  const handleBreadCrumb = (term)=>{
+//   ;
+//  }
 
   return (
     <div>
@@ -134,6 +130,13 @@ const App = () => {
           <option value="points">Points</option>
           <option value="num_comments">Num Comments</option>
       </select> <br /> <br />
+      <button onDoubleClick={handleReverse}>Reverse</button> <br />
+      {
+        // setSearchTerm
+        urls.map(el => {
+          return <button onClick={(e) => setSearchTerm(e.target.textContent)}>{el.split("=")[1]}</button>
+        })
+      }
 
       <SearchForm
         searchTerm={searchTerm}
@@ -148,7 +151,7 @@ const App = () => {
       {stories.isLoading ? (
         <p>Loading ...</p>
       ) : (
-        <List list={stories.data} onRemoveItem={handleRemoveStory} sortBy={sortState} />
+        <List list={stories.data} onRemoveItem={handleRemoveStory} sortBy={sortState} reverse={reverse} />
       )}
     </div>
   );
