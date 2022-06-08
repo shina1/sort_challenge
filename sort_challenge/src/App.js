@@ -33,7 +33,8 @@ const storiesReducer = (state, action) => {
         ...state,
         isLoading: false,
         isError: false,
-        data: action.payload,
+        data: action.payload.hits,
+        currentPage: action.payload.page
       };
     case 'STORIES_FETCH_FAILURE':
       return {
@@ -78,9 +79,11 @@ const App = () => {
   
       const result = await axios.get(urls[urls.length - 1]);
 
+
+
       dispatchStories({
         type: 'STORIES_FETCH_SUCCESS',
-        payload: result.data.hits,
+        payload: result.data,
       });
     } catch {
       dispatchStories({ type: 'STORIES_FETCH_FAILURE' });
@@ -103,6 +106,7 @@ const App = () => {
   };
 
   const handleSearchSubmit = event => {
+    // avoiding duplicate search
     const sliceIndex = urls.length == 5 ? 1 : 0; 
     setUrls(Array.from(new Set(urls.slice(sliceIndex).concat(`${API_ENDPOINT}${searchTerm}`))));
 
@@ -133,7 +137,8 @@ const App = () => {
       <button onDoubleClick={handleReverse}>Reverse</button> <br />
       {
         // setSearchTerm
-        urls.map(el => {
+        
+        urls.slice(0, urls.length - 1).map(el => { 
           return <button onClick={(e) => setSearchTerm(e.target.textContent)}>{el.split("=")[1]}</button>
         })
       }
